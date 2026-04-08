@@ -76,6 +76,14 @@ export default function App() {
     if (data) setStats(data)
   }
 
+  const areaProgress = {}
+  AREAS.forEach(a => {
+    areaProgress[a.id] = {}
+    ;(topics[a.id] || []).forEach(t => {
+      if (progress[t.id]) areaProgress[a.id][t.id] = progress[t.id]
+    })
+  })
+
   const awardXp = async (action, score = 0, total = 1, currentStats = stats, currentAreaProgress = areaProgress) => {
     const gain = xpForAction(action, score, total)
     if (gain === 0) return
@@ -100,14 +108,6 @@ export default function App() {
     await supabase.from('user_stats').upsert(updated, { onConflict: 'user_id' })
     setStats({ xp: newXp, level: newLevel, streak: newStreak, last_studied_date: today, badges: newBadges })
   }
-
-  const areaProgress = {}
-  AREAS.forEach(a => {
-    areaProgress[a.id] = {}
-    ;(topics[a.id] || []).forEach(t => {
-      if (progress[t.id]) areaProgress[a.id][t.id] = progress[t.id]
-    })
-  })
 
   if (loading) return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
