@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from './lib/supabase'
+import { xpForAction, getLevel, checkNewBadges } from './lib/gamification'
 import Auth from './components/Auth'
 import LandingPage from './components/LandingPage'
 import Sidebar, { AREAS } from './components/Sidebar'
@@ -64,26 +65,25 @@ export default function App() {
     if (data) setStats(data)
   }
 
-  const awardXp = async (action, score = 0, total = 1) => {
-    const { xpForAction, getLevel, checkNewBadges } = await import('./lib/gamification')
+  const awardXp = async (action, score = 0, total = 1, currentStats = stats, currentAreaProgress = areaProgress) => {
     const gain = xpForAction(action, score, total)
     if (gain === 0) return
 
-    const newXp = stats.xp + gain
+    const newXp = currentStats.xp + gain
     const newLevel = getLevel(newXp).level
 
     const today = new Date().toISOString().slice(0, 10)
     const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10)
-    let newStreak = stats.streak
-    if (stats.last_studied_date !== today) {
-      newStreak = stats.last_studied_date === yesterday ? stats.streak + 1 : 1
+    let newStreak = currentStats.streak
+    if (currentStats.last_studied_date !== today) {
+      newStreak = currentStats.last_studied_date === yesterday ? currentStats.streak + 1 : 1
     }
 
     const learnedCount = Object.values(progress).filter(p => p.learned).length + (action === 'learned' ? 1 : 0)
     const perfectQuizzes = Object.values(progress).filter(p => p.quiz_score != null && p.quiz_score === p.quiz_total).length + (action === 'quiz' && score === total ? 1 : 0)
-    const touchedAreas = Object.keys(areaProgress).filter(aId => Object.keys(areaProgress[aId]).length > 0).length
-    const newBadgeIds = checkNewBadges(stats.badges, { learnedCount, perfectQuizCount: perfectQuizzes, touchedAreas, streak: newStreak })
-    const newBadges = [...stats.badges, ...newBadgeIds]
+    const touchedAreas = Object.keys(currentAreaProgress).filter(aId => Object.keys(currentAreaProgress[aId]).length > 0).length
+    const newBadgeIds = checkNewBadges(currentStats.badges, { learnedCount, perfectQuizCount: perfectQuizzes, touchedAreas, streak: newStreak })
+    const newBadges = [...currentStats.badges, ...newBadgeIds]
 
     const updated = { user_id: session.user.id, xp: newXp, level: newLevel, streak: newStreak, last_studied_date: today, badges: newBadges }
     await supabase.from('user_stats').upsert(updated, { onConflict: 'user_id' })
@@ -150,7 +150,7 @@ export default function App() {
               onStartQuiz={() => setView('quiz')}
               onLearned={(topicId) => {
                 setProgress(p => ({ ...p, [topicId]: { ...p[topicId], learned: true, last_studied: new Date().toISOString() } }))
-                awardXp('learned')
+                awardXp('learned', 0, 1, stats, areaProgress)
               }}
             />
           )}
@@ -163,7 +163,7 @@ export default function App() {
               onDone={() => setView('topics')}
               onScoreSaved={(topicId, score, total) => {
                 setProgress(p => ({ ...p, [topicId]: { ...p[topicId], quiz_score: score, quiz_total: total, attempts: (p[topicId]?.attempts || 0) + 1 } }))
-                awardXp('quiz', score, total)
+                awardXp('quiz', score, total, stats, areaProgress)
               }}
             />
           )}

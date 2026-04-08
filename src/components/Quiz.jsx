@@ -27,7 +27,7 @@ export default function Quiz({ topic, area, userId, onBack, onDone, onScoreSaved
       await supabase.from('user_progress').upsert({
         user_id: userId, topic_id: topic.id,
         quiz_score: newScore, quiz_total: questions.length,
-        attempts: 1, last_studied: new Date().toISOString()
+        last_studied: new Date().toISOString()
       }, { onConflict: 'user_id,topic_id' })
       onScoreSaved(topic.id, newScore, questions.length)
       setScore(newScore)
