@@ -1,1 +1,3 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#1D9E75"/><text x="16" y="22" text-anchor="middle" font-size="18" font-family="sans-serif" font-weight="bold" fill="white">L</text></svg>
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+export default defineConfig({ plugins: [react()] })
