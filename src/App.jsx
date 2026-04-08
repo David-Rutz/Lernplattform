@@ -10,6 +10,7 @@ import Learn from './components/Learn'
 import Quiz from './components/Quiz'
 import Progress from './components/Progress'
 import Header from './components/Header'
+import NeedFinder from './components/NeedFinder'
 
 export default function App() {
   const [session, setSession] = useState(null)
@@ -22,6 +23,10 @@ export default function App() {
   const [topics, setTopics] = useState({})
   const [progress, setProgress] = useState({})
   const [stats, setStats] = useState({ xp: 0, level: 1, streak: 0, last_studied_date: null, badges: [] })
+  const [showNeedFinder, setShowNeedFinder] = useState(false)
+  const [preferences, setPreferences] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('learnhub_preferences') || 'null') } catch { return null }
+  })
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -37,6 +42,12 @@ export default function App() {
       loadTopics()
       loadProgress()
       loadStats()
+    }
+  }, [session])
+
+  useEffect(() => {
+    if (session && !localStorage.getItem('learnhub_onboarding_done')) {
+      setShowNeedFinder(true)
     }
   }, [session])
 
@@ -131,6 +142,7 @@ export default function App() {
               setSelectedArea={setSelectedArea}
               setSelectedLevel={setSelectedLevel}
               progress={areaProgress}
+              preferences={preferences}
             />
           )}
           {view === 'topics' && selectedArea && (
@@ -178,6 +190,12 @@ export default function App() {
           )}
         </div>
       </main>
+      {showNeedFinder && (
+        <NeedFinder onDone={(prefs) => {
+          setShowNeedFinder(false)
+          if (prefs) setPreferences(prefs)
+        }} />
+      )}
     </div>
   )
 }

@@ -1,8 +1,18 @@
 import { AREAS } from './Sidebar'
 
-export default function Home({ setView, setSelectedArea, setSelectedLevel, progress }) {
+const GOAL_AREAS = {
+  job_current: ['ict', 'management', 'hr'],
+  job_change:  ['ict', 'marketing', 'hr'],
+  refresh:     ['finanzen', 'vwl', 'recht'],
+  exam:        ['finanzen', 'recht', 'vwl'],
+}
+
+export default function Home({ setView, setSelectedArea, setSelectedLevel, progress, preferences }) {
   const totalLearned = Object.values(progress).reduce((s, a) => s + Object.values(a).filter(p => p.learned).length, 0)
   const totalQuizzed = Object.values(progress).reduce((s, a) => s + Object.values(a).filter(p => p.quiz_score != null).length, 0)
+
+  const recommendedIds = preferences?.goal ? (GOAL_AREAS[preferences.goal] || []) : []
+  const recommended = AREAS.filter(a => recommendedIds.includes(a.id))
 
   return (
     <div style={{ padding: '40px 48px', maxWidth: 900 }}>
@@ -18,6 +28,31 @@ export default function Home({ setView, setSelectedArea, setSelectedLevel, progr
         </div>
       )}
 
+      {recommended.length > 0 && (
+        <div style={{ marginBottom: 40 }}>
+          <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 12, color: '#1D9E75' }}>⭐ Empfohlen für dich</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 12 }}>
+            {recommended.map(a => {
+              const done = Object.values(progress[a.id] || {}).filter(p => p.learned).length
+              return (
+                <button key={a.id} onClick={() => { setSelectedArea(a); setView('topics') }} style={{
+                  background: 'linear-gradient(135deg, #F0FDF9, #fff)', border: '2px solid #1D9E75',
+                  borderRadius: 12, padding: '20px', textAlign: 'left', cursor: 'pointer',
+                  boxShadow: '0 2px 8px rgba(29,158,117,0.12)'
+                }}>
+                  <div style={{ fontSize: 28, marginBottom: 10 }}>{a.icon}</div>
+                  <div style={{ fontWeight: 500, fontSize: 14, marginBottom: 4 }}>{a.name}</div>
+                  {done > 0 && <div style={{ fontSize: 12, color: '#1D9E75' }}>{done} gelernt</div>}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      <div style={{ marginBottom: 16 }}>
+        <h2 style={{ fontSize: 16, fontWeight: 600, color: '#374151' }}>Alle Fachbereiche</h2>
+      </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 16 }}>
         {AREAS.map(a => {
           const done = Object.values(progress[a.id] || {}).filter(p => p.learned).length
