@@ -10,7 +10,7 @@ import Learn from './components/Learn'
 import Quiz from './components/Quiz'
 import Progress from './components/Progress'
 import Header from './components/Header'
-import NeedFinder from './components/NeedFinder'
+import NeedFinderPanel from './components/NeedFinderPanel'
 
 export default function App() {
   const [session, setSession] = useState(null)
@@ -23,7 +23,6 @@ export default function App() {
   const [topics, setTopics] = useState({})
   const [progress, setProgress] = useState({})
   const [stats, setStats] = useState({ xp: 0, level: 1, streak: 0, last_studied_date: null, badges: [] })
-  const [showNeedFinder, setShowNeedFinder] = useState(false)
   const [preferences, setPreferences] = useState(() => {
     try { return JSON.parse(localStorage.getItem('learnhub_preferences') || 'null') } catch { return null }
   })
@@ -42,12 +41,6 @@ export default function App() {
       loadTopics()
       loadProgress()
       loadStats()
-    }
-  }, [session])
-
-  useEffect(() => {
-    if (session && !localStorage.getItem('learnhub_onboarding_done')) {
-      setShowNeedFinder(true)
     }
   }, [session])
 
@@ -133,7 +126,7 @@ export default function App() {
         progress={areaProgress}
         stats={stats}
       />
-      <main style={{ flex: 1, overflowY: 'auto', background: '#F8F9FA', display: 'flex', flexDirection: 'column' }}>
+      <main style={{ flex: 1, overflowY: 'auto', background: '#F8F9FA', display: 'flex', flexDirection: 'column', minWidth: 0 }}>
         <Header stats={stats} />
         <div style={{ flex: 1 }}>
           {view === 'home' && (
@@ -190,12 +183,12 @@ export default function App() {
           )}
         </div>
       </main>
-      {showNeedFinder && (
-        <NeedFinder onDone={(prefs) => {
-          setShowNeedFinder(false)
-          if (prefs) setPreferences(prefs)
-        }} />
-      )}
+      <NeedFinderPanel
+        preferences={preferences}
+        onComplete={(prefs) => setPreferences(prefs)}
+        onStartAuth={null}
+        context="dashboard"
+      />
     </div>
   )
 }

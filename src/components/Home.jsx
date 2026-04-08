@@ -11,7 +11,9 @@ export default function Home({ setView, setSelectedArea, setSelectedLevel, progr
   const totalLearned = Object.values(progress).reduce((s, a) => s + Object.values(a).filter(p => p.learned).length, 0)
   const totalQuizzed = Object.values(progress).reduce((s, a) => s + Object.values(a).filter(p => p.quiz_score != null).length, 0)
 
-  const recommendedIds = preferences?.goal ? (GOAL_AREAS[preferences.goal] || []) : []
+  const recommendedIds = preferences?.jobAreas?.length > 0
+    ? preferences.jobAreas
+    : (preferences?.goal ? (GOAL_AREAS[preferences.goal] || []) : [])
   const recommended = AREAS.filter(a => recommendedIds.includes(a.id))
 
   return (
