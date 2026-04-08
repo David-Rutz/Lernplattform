@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from './lib/supabase'
 import Auth from './components/Auth'
+import LandingPage from './components/LandingPage'
 import Sidebar, { AREAS } from './components/Sidebar'
 import Home from './components/Home'
 import TopicList from './components/TopicList'
@@ -11,12 +12,13 @@ import Progress from './components/Progress'
 export default function App() {
   const [session, setSession] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [showLanding, setShowLanding] = useState(true)
   const [view, setView] = useState('home')
   const [selectedArea, setSelectedArea] = useState(null)
   const [selectedTopic, setSelectedTopic] = useState(null)
   const [selectedLevel, setSelectedLevel] = useState(null)
-  const [topics, setTopics] = useState({}) // { areaId: [topic, ...] }
-  const [progress, setProgress] = useState({}) // { topicId: {...} }
+  const [topics, setTopics] = useState({})
+  const [progress, setProgress] = useState({})
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -50,7 +52,6 @@ export default function App() {
     setProgress(map)
   }
 
-  // Area-level progress map: { areaId: { topicId: {learned, quiz_score, ...} } }
   const areaProgress = {}
   AREAS.forEach(a => {
     areaProgress[a.id] = {}
@@ -66,7 +67,11 @@ export default function App() {
     </div>
   )
 
-  if (!session) return <Auth />
+  // Not logged in: show landing or auth
+  if (!session) {
+    if (showLanding) return <LandingPage onStartAuth={() => setShowLanding(false)} />
+    return <Auth />
+  }
 
   const currentAreaTopics = selectedArea ? (topics[selectedArea.id] || []) : []
 
@@ -78,7 +83,6 @@ export default function App() {
         user={session.user}
         progress={areaProgress}
       />
-
       <main style={{ flex: 1, overflowY: 'auto', background: '#F8F9FA' }}>
         {view === 'home' && (
           <Home
@@ -88,7 +92,6 @@ export default function App() {
             progress={areaProgress}
           />
         )}
-
         {view === 'topics' && selectedArea && (
           <TopicList
             area={selectedArea}
@@ -97,7 +100,6 @@ export default function App() {
             onSelect={(topic) => { setSelectedTopic(topic); setView('learn') }}
           />
         )}
-
         {view === 'learn' && selectedTopic && selectedArea && (
           <Learn
             topic={selectedTopic}
@@ -110,7 +112,6 @@ export default function App() {
             }}
           />
         )}
-
         {view === 'quiz' && selectedTopic && selectedArea && (
           <Quiz
             topic={selectedTopic}
@@ -123,7 +124,6 @@ export default function App() {
             }}
           />
         )}
-
         {view === 'progress' && (
           <Progress
             progress={progress}
