@@ -1,6 +1,6 @@
 import { LEVELS, getLevelProgress } from '../lib/gamification'
 
-export default function Header({ stats }) {
+export default function Header({ stats, onTogglePanel, showPanel }) {
   const xp = stats?.xp ?? 0
   const level = stats?.level ?? 1
   const streak = stats?.streak ?? 0
@@ -34,6 +34,19 @@ export default function Header({ stats }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 13, color: '#F59E0B', fontWeight: 600 }}>
           🔥 {streak} Tag{streak !== 1 ? 'e' : ''}
         </div>
+      )}
+
+      {onTogglePanel && (
+        <button onClick={onTogglePanel} style={{
+          marginLeft: 'auto', background: showPanel ? '#1D9E75' : '#F0FDF9',
+          border: `1px solid ${showPanel ? '#1D9E75' : '#A7F3D0'}`,
+          color: showPanel ? '#fff' : '#065F46',
+          borderRadius: 8, padding: '6px 14px', fontSize: 12, fontWeight: 600,
+          cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6,
+          flexShrink: 0,
+        }}>
+          🎯 Mein Profil
+        </button>
       )}
     </div>
   )

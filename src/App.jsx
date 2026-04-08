@@ -26,6 +26,7 @@ export default function App() {
   const [preferences, setPreferences] = useState(() => {
     try { return JSON.parse(localStorage.getItem('learnhub_preferences') || 'null') } catch { return null }
   })
+  const [showPanel, setShowPanel] = useState(false)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -127,7 +128,7 @@ export default function App() {
         stats={stats}
       />
       <main style={{ flex: 1, overflowY: 'auto', background: '#F8F9FA', display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-        <Header stats={stats} />
+        <Header stats={stats} onTogglePanel={() => setShowPanel(p => !p)} showPanel={showPanel} />
         <div style={{ flex: 1 }}>
           {view === 'home' && (
             <Home
@@ -183,12 +184,15 @@ export default function App() {
           )}
         </div>
       </main>
-      <NeedFinderPanel
-        preferences={preferences}
-        onComplete={(prefs) => setPreferences(prefs)}
-        onStartAuth={null}
-        context="dashboard"
-      />
+      {showPanel && (
+        <NeedFinderPanel
+          preferences={preferences}
+          onComplete={(prefs) => setPreferences(prefs)}
+          onClose={() => setShowPanel(false)}
+          onStartAuth={null}
+          context="dashboard"
+        />
+      )}
     </div>
   )
 }

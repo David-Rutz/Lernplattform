@@ -15,7 +15,7 @@ const LEVEL_OPTIONS = [
   { value: 'experte',          label: 'Experte',            icon: '🌳' },
 ]
 
-export default function NeedFinderPanel({ preferences, onComplete, onStartAuth, context }) {
+export default function NeedFinderPanel({ preferences, onComplete, onStartAuth, onClose, context }) {
   const [editing, setEditing] = useState(!preferences)
   const [job, setJob] = useState(preferences?.job || '')
   const [jobAreas, setJobAreas] = useState(preferences?.jobAreas || [])
@@ -58,6 +58,7 @@ export default function NeedFinderPanel({ preferences, onComplete, onStartAuth, 
           <span style={{ fontSize: 14 }}>🎯</span>
           <span style={{ fontSize: 12, fontWeight: 700, color: '#fff' }}>Mein Profil</span>
           <button onClick={() => setEditing(true)} style={editBtnStyle}>✏️ Ändern</button>
+          {onClose && <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.7)', fontSize: 14, cursor: 'pointer', marginLeft: 4, padding: 0 }}>✕</button>}
         </div>
 
         <div style={{ padding: '14px', flex: 1, overflowY: 'auto' }}>
@@ -98,8 +99,8 @@ export default function NeedFinderPanel({ preferences, onComplete, onStartAuth, 
         <span style={{ fontSize: 12, fontWeight: 700, color: '#fff' }}>Lernpfad-Finder</span>
         {context === 'dashboard' && (
           <button
-            onClick={() => setEditing(false)}
-            style={{ marginLeft: 'auto', background: 'none', border: 'none', color: 'rgba(255,255,255,0.7)', fontSize: 11, cursor: 'pointer' }}
+            onClick={() => onClose ? onClose() : setEditing(false)}
+            style={{ marginLeft: 'auto', background: 'none', border: 'none', color: 'rgba(255,255,255,0.7)', fontSize: 14, cursor: 'pointer' }}
           >✕</button>
         )}
       </div>
