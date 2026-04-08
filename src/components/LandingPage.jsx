@@ -1,4 +1,3 @@
-import { useEffect, useRef } from 'react'
 import { AREAS } from './Sidebar'
 
 const FEATURES = [
