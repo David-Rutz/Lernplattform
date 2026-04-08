@@ -18,7 +18,7 @@ const TESTIMONIALS = [
 const LEVEL_LABELS = { einsteiger: 'Einsteiger', fortgeschrittene: 'Fortgeschrittene', experte: 'Experte' }
 const LEVEL_COLORS = { einsteiger: '#1D9E75', fortgeschrittene: '#F59E0B', experte: '#6366F1' }
 
-export default function LandingPage({ onStartAuth }) {
+export default function LandingPage({ onStartAuth, backToDashboard }) {
   const [view, setView] = useState('home') // 'home' | 'area' | 'topic'
   const [selectedArea, setSelectedArea] = useState(null)
   const [selectedTopic, setSelectedTopic] = useState(null)
@@ -111,8 +111,16 @@ export default function LandingPage({ onStartAuth }) {
         </button>
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <button onClick={onStartAuth} className="navbar-cta-text" style={{ background: 'none', border: 'none', color: '#A7F3D0', fontSize: 14, cursor: 'pointer', padding: '6px 12px', borderRadius: 8 }}>Anmelden</button>
-        <button onClick={onStartAuth} className="cta-btn" style={{ background: '#1D9E75', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 18px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Kostenlos starten</button>
+        {backToDashboard ? (
+          <button onClick={backToDashboard} className="cta-btn" style={{ background: '#1D9E75', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 18px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
+            → Zum Dashboard
+          </button>
+        ) : (
+          <>
+            <button onClick={onStartAuth} className="navbar-cta-text" style={{ background: 'none', border: 'none', color: '#A7F3D0', fontSize: 14, cursor: 'pointer', padding: '6px 12px', borderRadius: 8 }}>Anmelden</button>
+            <button onClick={onStartAuth} className="cta-btn" style={{ background: '#1D9E75', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 18px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Kostenlos starten</button>
+          </>
+        )}
       </div>
     </nav>
   )

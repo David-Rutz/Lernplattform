@@ -14,7 +14,7 @@ const AREAS = [
 
 export { AREAS }
 
-export default function Sidebar({ view, setView, selectedArea, setSelectedArea, user, progress, stats }) {
+export default function Sidebar({ view, setView, selectedArea, setSelectedArea, user, progress, stats, onShowLanding }) {
   const totalTopics = Object.values(progress).reduce((s, a) => s + Object.keys(a).length, 0)
 
   const getAreaDone = (id) => Object.values(progress[id] || {}).filter(p => p.learned).length
@@ -60,14 +60,23 @@ export default function Sidebar({ view, setView, selectedArea, setSelectedArea, 
             <span style={{ color: '#6B7280', fontSize: 11 }}>{stats.xp} XP</span>
           </div>
         )}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
           <div style={{ width: 30, height: 30, borderRadius: '50%', background: '#1D9E75', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 600, color: '#fff', flexShrink: 0 }}>
             {(user?.user_metadata?.full_name || user?.email || '?')[0].toUpperCase()}
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ color: '#E5E7EB', fontSize: 13, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.user_metadata?.full_name || user?.email}</div>
           </div>
-          <button onClick={() => supabase.auth.signOut()} title="Abmelden" style={{ color: '#6B7280', fontSize: 13, cursor: 'pointer', background: 'none', border: 'none', padding: 4, borderRadius: 6 }}>⎋</button>
+        </div>
+        <div style={{ display: 'flex', gap: 6 }}>
+          {onShowLanding && (
+            <button onClick={onShowLanding} style={{ flex: 1, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#9CA3AF', borderRadius: 7, padding: '7px 8px', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>
+              🌐 Website
+            </button>
+          )}
+          <button onClick={() => supabase.auth.signOut()} style={{ flex: 1, background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', color: '#F87171', borderRadius: 7, padding: '7px 8px', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>
+            Abmelden
+          </button>
         </div>
       </div>
     </nav>

@@ -16,6 +16,7 @@ export default function App() {
   const [session, setSession] = useState(null)
   const [loading, setLoading] = useState(true)
   const [showLanding, setShowLanding] = useState(true)
+  const [viewingLanding, setViewingLanding] = useState(false)
   const [view, setView] = useState('home')
   const [selectedArea, setSelectedArea] = useState(null)
   const [selectedTopic, setSelectedTopic] = useState(null)
@@ -116,6 +117,11 @@ export default function App() {
     return <Auth onBack={() => setShowLanding(true)} />
   }
 
+  // Logged in but browsing the public landing page
+  if (viewingLanding) {
+    return <LandingPage onStartAuth={() => setViewingLanding(false)} backToDashboard={() => setViewingLanding(false)} />
+  }
+
   const currentAreaTopics = selectedArea ? (topics[selectedArea.id] || []) : []
 
   return (
@@ -126,6 +132,7 @@ export default function App() {
         user={session.user}
         progress={areaProgress}
         stats={stats}
+        onShowLanding={() => setViewingLanding(true)}
       />
       <main style={{ flex: 1, overflowY: 'auto', background: '#F8F9FA', display: 'flex', flexDirection: 'column', minWidth: 0 }}>
         <Header stats={stats} onTogglePanel={() => setShowPanel(p => !p)} showPanel={showPanel} />
