@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { generateQuiz } from '../lib/claude'
 import { supabase } from '../lib/supabase'
+import confetti from 'canvas-confetti'
 
 export default function Quiz({ topic, area, userId, onBack, onDone, onScoreSaved }) {
   const [questions, setQuestions] = useState(null)
@@ -31,6 +32,9 @@ export default function Quiz({ topic, area, userId, onBack, onDone, onScoreSaved
       onScoreSaved(topic.id, newScore, questions.length)
       setScore(newScore)
       setDone(true)
+      if (newScore / questions.length >= 0.8) {
+        confetti({ particleCount: 120, spread: 70, origin: { y: 0.6 }, colors: ['#1D9E75', '#6EE7B7', '#F59E0B', '#fff'] })
+      }
     } else {
       setScore(newScore)
       setCurrent(c => c + 1)

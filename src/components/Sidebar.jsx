@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase'
+import { getLevelProgress } from '../lib/gamification'
 
 const AREAS = [
   { id: 'ict', name: 'ICT & Informatik', icon: '💻' },
@@ -13,7 +14,7 @@ const AREAS = [
 
 export { AREAS }
 
-export default function Sidebar({ view, setView, selectedArea, setSelectedArea, user, progress }) {
+export default function Sidebar({ view, setView, selectedArea, setSelectedArea, user, progress, stats }) {
   const totalTopics = Object.values(progress).reduce((s, a) => s + Object.keys(a).length, 0)
 
   const getAreaDone = (id) => Object.values(progress[id] || {}).filter(p => p.learned).length
@@ -50,14 +51,24 @@ export default function Sidebar({ view, setView, selectedArea, setSelectedArea, 
       </div>
 
       {/* User */}
-      <div style={{ padding: '14px 16px', borderTop: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', gap: 10 }}>
-        <div style={{ width: 30, height: 30, borderRadius: '50%', background: '#1D9E75', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 600, color: '#fff', flexShrink: 0 }}>
-          {(user?.user_metadata?.full_name || user?.email || '?')[0].toUpperCase()}
+      <div style={{ padding: '14px 16px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+        {stats && (
+          <div style={{ marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div style={{ flex: 1, height: 4, background: 'rgba(255,255,255,0.1)', borderRadius: 2, overflow: 'hidden' }}>
+              <div style={{ width: `${Math.min(getLevelProgress(stats.xp) * 100, 100)}%`, height: '100%', background: '#1D9E75', borderRadius: 2 }} />
+            </div>
+            <span style={{ color: '#6B7280', fontSize: 11 }}>{stats.xp} XP</span>
+          </div>
+        )}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{ width: 30, height: 30, borderRadius: '50%', background: '#1D9E75', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 600, color: '#fff', flexShrink: 0 }}>
+            {(user?.user_metadata?.full_name || user?.email || '?')[0].toUpperCase()}
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ color: '#E5E7EB', fontSize: 13, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.user_metadata?.full_name || user?.email}</div>
+          </div>
+          <button onClick={() => supabase.auth.signOut()} title="Abmelden" style={{ color: '#6B7280', fontSize: 13, cursor: 'pointer', background: 'none', border: 'none', padding: 4, borderRadius: 6 }}>⎋</button>
         </div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ color: '#E5E7EB', fontSize: 13, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.user_metadata?.full_name || user?.email}</div>
-        </div>
-        <button onClick={() => supabase.auth.signOut()} title="Abmelden" style={{ color: '#6B7280', fontSize: 13, cursor: 'pointer', background: 'none', border: 'none', padding: 4, borderRadius: 6 }}>⎋</button>
       </div>
     </nav>
   )

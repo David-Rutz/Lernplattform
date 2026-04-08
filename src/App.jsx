@@ -8,6 +8,7 @@ import TopicList from './components/TopicList'
 import Learn from './components/Learn'
 import Quiz from './components/Quiz'
 import Progress from './components/Progress'
+import Header from './components/Header'
 
 export default function App() {
   const [session, setSession] = useState(null)
@@ -19,6 +20,7 @@ export default function App() {
   const [selectedLevel, setSelectedLevel] = useState(null)
   const [topics, setTopics] = useState({})
   const [progress, setProgress] = useState({})
+  const [stats, setStats] = useState({ xp: 0, level: 1, streak: 0, last_studied_date: null, badges: [] })
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -33,6 +35,7 @@ export default function App() {
     if (session) {
       loadTopics()
       loadProgress()
+      loadStats()
     }
   }, [session])
 
@@ -50,6 +53,41 @@ export default function App() {
     const map = {}
     data.forEach(p => { map[p.topic_id] = p })
     setProgress(map)
+  }
+
+  const loadStats = async () => {
+    const { data } = await supabase
+      .from('user_stats')
+      .select('*')
+      .eq('user_id', session.user.id)
+      .single()
+    if (data) setStats(data)
+  }
+
+  const awardXp = async (action, score = 0, total = 1) => {
+    const { xpForAction, getLevel, checkNewBadges } = await import('./lib/gamification')
+    const gain = xpForAction(action, score, total)
+    if (gain === 0) return
+
+    const newXp = stats.xp + gain
+    const newLevel = getLevel(newXp).level
+
+    const today = new Date().toISOString().slice(0, 10)
+    const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10)
+    let newStreak = stats.streak
+    if (stats.last_studied_date !== today) {
+      newStreak = stats.last_studied_date === yesterday ? stats.streak + 1 : 1
+    }
+
+    const learnedCount = Object.values(progress).filter(p => p.learned).length + (action === 'learned' ? 1 : 0)
+    const perfectQuizzes = Object.values(progress).filter(p => p.quiz_score != null && p.quiz_score === p.quiz_total).length + (action === 'quiz' && score === total ? 1 : 0)
+    const touchedAreas = Object.keys(areaProgress).filter(aId => Object.keys(areaProgress[aId]).length > 0).length
+    const newBadgeIds = checkNewBadges(stats.badges, { learnedCount, perfectQuizCount: perfectQuizzes, touchedAreas, streak: newStreak })
+    const newBadges = [...stats.badges, ...newBadgeIds]
+
+    const updated = { user_id: session.user.id, xp: newXp, level: newLevel, streak: newStreak, last_studied_date: today, badges: newBadges }
+    await supabase.from('user_stats').upsert(updated, { onConflict: 'user_id' })
+    setStats({ xp: newXp, level: newLevel, streak: newStreak, last_studied_date: today, badges: newBadges })
   }
 
   const areaProgress = {}
@@ -82,57 +120,63 @@ export default function App() {
         selectedArea={selectedArea} setSelectedArea={setSelectedArea}
         user={session.user}
         progress={areaProgress}
+        stats={stats}
       />
-      <main style={{ flex: 1, overflowY: 'auto', background: '#F8F9FA' }}>
-        {view === 'home' && (
-          <Home
-            setView={setView}
-            setSelectedArea={setSelectedArea}
-            setSelectedLevel={setSelectedLevel}
-            progress={areaProgress}
-          />
-        )}
-        {view === 'topics' && selectedArea && (
-          <TopicList
-            area={selectedArea}
-            topics={currentAreaTopics}
-            progress={progress}
-            onSelect={(topic) => { setSelectedTopic(topic); setView('learn') }}
-          />
-        )}
-        {view === 'learn' && selectedTopic && selectedArea && (
-          <Learn
-            topic={selectedTopic}
-            area={selectedArea}
-            userId={session.user.id}
-            onBack={() => setView('topics')}
-            onStartQuiz={() => setView('quiz')}
-            onLearned={(topicId) => {
-              setProgress(p => ({ ...p, [topicId]: { ...p[topicId], learned: true, last_studied: new Date().toISOString() } }))
-            }}
-          />
-        )}
-        {view === 'quiz' && selectedTopic && selectedArea && (
-          <Quiz
-            topic={selectedTopic}
-            area={selectedArea}
-            userId={session.user.id}
-            onBack={() => setView('learn')}
-            onDone={() => setView('topics')}
-            onScoreSaved={(topicId, score, total) => {
-              setProgress(p => ({ ...p, [topicId]: { ...p[topicId], quiz_score: score, quiz_total: total, attempts: (p[topicId]?.attempts || 0) + 1 } }))
-            }}
-          />
-        )}
-        {view === 'progress' && (
-          <Progress
-            progress={progress}
-            topics={topics}
-            setSelectedArea={setSelectedArea}
-            setSelectedTopic={setSelectedTopic}
-            setView={setView}
-          />
-        )}
+      <main style={{ flex: 1, overflowY: 'auto', background: '#F8F9FA', display: 'flex', flexDirection: 'column' }}>
+        <Header stats={stats} />
+        <div style={{ flex: 1 }}>
+          {view === 'home' && (
+            <Home
+              setView={setView}
+              setSelectedArea={setSelectedArea}
+              setSelectedLevel={setSelectedLevel}
+              progress={areaProgress}
+            />
+          )}
+          {view === 'topics' && selectedArea && (
+            <TopicList
+              area={selectedArea}
+              topics={currentAreaTopics}
+              progress={progress}
+              onSelect={(topic) => { setSelectedTopic(topic); setView('learn') }}
+            />
+          )}
+          {view === 'learn' && selectedTopic && selectedArea && (
+            <Learn
+              topic={selectedTopic}
+              area={selectedArea}
+              userId={session.user.id}
+              onBack={() => setView('topics')}
+              onStartQuiz={() => setView('quiz')}
+              onLearned={(topicId) => {
+                setProgress(p => ({ ...p, [topicId]: { ...p[topicId], learned: true, last_studied: new Date().toISOString() } }))
+                awardXp('learned')
+              }}
+            />
+          )}
+          {view === 'quiz' && selectedTopic && selectedArea && (
+            <Quiz
+              topic={selectedTopic}
+              area={selectedArea}
+              userId={session.user.id}
+              onBack={() => setView('learn')}
+              onDone={() => setView('topics')}
+              onScoreSaved={(topicId, score, total) => {
+                setProgress(p => ({ ...p, [topicId]: { ...p[topicId], quiz_score: score, quiz_total: total, attempts: (p[topicId]?.attempts || 0) + 1 } }))
+                awardXp('quiz', score, total)
+              }}
+            />
+          )}
+          {view === 'progress' && (
+            <Progress
+              progress={progress}
+              topics={topics}
+              setSelectedArea={setSelectedArea}
+              setSelectedTopic={setSelectedTopic}
+              setView={setView}
+            />
+          )}
+        </div>
       </main>
     </div>
   )
