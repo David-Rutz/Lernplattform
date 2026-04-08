@@ -78,7 +78,7 @@ export default function Quiz({ topic, area, userId, onBack, onDone, onScoreSaved
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
         {q.opts.map((opt, i) => (
-          <button key={i} onClick={() => handleAnswer(i)} style={{
+          <button key={i} onClick={() => setSelected(i)} style={{
             padding: '13px 18px', borderRadius: 10, cursor: 'pointer', textAlign: 'left', fontSize: 14,
             background: selected === i ? '#1D9E75' : '#fff',
             color: selected === i ? '#fff' : '#111827',
