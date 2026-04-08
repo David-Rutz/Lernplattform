@@ -5,12 +5,25 @@ import { supabase } from '../lib/supabase'
 export default function Learn({ topic, area, userId, onBack, onStartQuiz, onLearned }) {
   const [content, setContent] = useState('')
   const [loading, setLoading] = useState(true)
+  const [generating, setGenerating] = useState(false)
   const [marking, setMarking] = useState(false)
 
   useEffect(() => {
     setLoading(true)
-    generateContent(topic.name, area.name, topic.level || 'einsteiger')
-      .then(c => { setContent(c); setLoading(false) })
+    setGenerating(false)
+
+    // Show "generating" hint after 300ms only if still loading (indicates cache miss)
+    const timer = setTimeout(() => setGenerating(true), 300)
+
+    generateContent(topic.id, topic.name, area.name, topic.level || 'einsteiger')
+      .then(result => {
+        clearTimeout(timer)
+        setContent(result?.text || '')
+        setLoading(false)
+        setGenerating(false)
+      })
+
+    return () => clearTimeout(timer)
   }, [topic.id])
 
   const handleLearned = async () => {
@@ -37,7 +50,7 @@ export default function Learn({ topic, area, userId, onBack, onStartQuiz, onLear
       {loading ? (
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, color: '#6B7280', fontSize: 14 }}>
           <div style={{ width: 20, height: 20, border: '2px solid #E5E7EB', borderTopColor: '#1D9E75', borderRadius: '50%', animation: 'spin .7s linear infinite' }} />
-          Inhalt wird generiert...
+          {generating ? 'KI generiert gerade...' : 'Lade Inhalt...'}
           <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
         </div>
       ) : (

@@ -13,9 +13,9 @@ export default function Quiz({ topic, area, userId, onBack, onDone, onScoreSaved
   const [error, setError] = useState(false)
 
   useEffect(() => {
-    generateQuiz(topic.name, area.name, topic.level || 'einsteiger').then(q => {
-      if (!q) { setError(true); setLoading(false); return }
-      setQuestions(q)
+    generateQuiz(topic.id, topic.name, area.name, topic.level || 'einsteiger').then(result => {
+      if (!result) { setError(true); setLoading(false); return }
+      setQuestions(result.questions)
       setLoading(false)
     })
   }, [topic.id])
