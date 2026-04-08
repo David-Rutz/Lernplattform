@@ -66,6 +66,25 @@ Kein Markdown, keine Sterne, keine Bullet Points. Nur sauberer Fliesstext in Abs
   )
 }
 
+export async function mapJobToAreas(job) {
+  if (!job || job.trim().length < 2) return []
+  const VALID_IDS = ['ict', 'marketing', 'finanzen', 'management', 'hr', 'recht', 'verkauf', 'vwl']
+  try {
+    const text = await callClaude(
+      `Welche 1-2 der folgenden Fachbereiche passen am besten zum Beruf "${job.trim()}"? ` +
+      `Antworte NUR mit den Fachbereich-IDs, kommagetrennt, keine anderen Zeichen. ` +
+      `Verfügbare IDs: ict, marketing, finanzen, management, hr, recht, verkauf, vwl`
+    )
+    return text
+      .split(',')
+      .map(s => s.trim().toLowerCase())
+      .filter(id => VALID_IDS.includes(id))
+      .slice(0, 2)
+  } catch {
+    return []
+  }
+}
+
 export async function generateQuiz(topicId, topicName, areaName, level) {
   const levelMap = { einsteiger: 'Einsteiger', fortgeschrittene: 'Fortgeschrittene', experte: 'Experte' }
   const result = await cachedCall(topicId, level, 'quiz', () =>
