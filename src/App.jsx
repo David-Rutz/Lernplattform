@@ -119,7 +119,7 @@ export default function App() {
   // Not logged in: show landing or auth
   if (!session) {
     if (showLanding) return <LandingPage onStartAuth={() => setShowLanding(false)} />
-    return <Auth />
+    return <Auth onBack={() => setShowLanding(true)} />
   }
 
   const currentAreaTopics = selectedArea ? (topics[selectedArea.id] || []) : []

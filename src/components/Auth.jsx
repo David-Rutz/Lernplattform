@@ -18,7 +18,7 @@ const s = {
   success: { background: '#E1F5EE', color: '#085041', padding: '10px 14px', borderRadius: 8, fontSize: 13, marginBottom: 16 },
 }
 
-export default function Auth() {
+export default function Auth({ onBack }) {
   const [mode, setMode] = useState('login')
   const [email, setEmail] = useState('')
   const [pw, setPw] = useState('')
@@ -51,6 +51,11 @@ export default function Auth() {
 
   return (
     <div style={s.wrap}>
+      {onBack && (
+        <button onClick={onBack} style={{ position: 'fixed', top: 20, left: 24, background: 'rgba(6,40,30,0.08)', border: 'none', color: '#065F46', fontSize: 13, fontWeight: 500, cursor: 'pointer', padding: '8px 16px', borderRadius: 20, display: 'flex', alignItems: 'center', gap: 6 }}>
+          ← Zur Startseite
+        </button>
+      )}
       <div style={s.card}>
         <div style={s.logo}>
           <div style={s.logoIcon}>L</div>
