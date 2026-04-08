@@ -16,6 +16,7 @@ async function callClaude(prompt) {
       messages: [{ role: 'user', content: prompt }]
     })
   })
+  if (!res.ok) throw new Error(`Claude API error: ${res.status}`)
   const data = await res.json()
   return data.content?.[0]?.text || ''
 }
@@ -38,7 +39,10 @@ async function cachedCall(topicId, level, type, generateFn) {
   if (!text) return { text: null, fromCache: false }
 
   // 3. Store
-  await supabase.from('content_cache').insert({ topic_id: topicId, level, type, content: text })
+  const { error: insertError } = await supabase
+    .from('content_cache')
+    .upsert({ topic_id: topicId, level, type, content: text }, { onConflict: 'topic_id,level,type', ignoreDuplicates: true })
+  if (insertError) console.warn('content_cache insert failed:', insertError.message)
 
   return { text, fromCache: false }
 }

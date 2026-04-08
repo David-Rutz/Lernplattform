@@ -22,6 +22,12 @@ export default function Learn({ topic, area, userId, onBack, onStartQuiz, onLear
         setLoading(false)
         setGenerating(false)
       })
+      .catch(() => {
+        clearTimeout(timer)
+        setLoading(false)
+        setGenerating(false)
+        setContent('')
+      })
 
     return () => clearTimeout(timer)
   }, [topic.id])
