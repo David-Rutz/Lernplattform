@@ -2,20 +2,52 @@ import { useState } from 'react'
 import { supabase } from '../lib/supabase'
 
 const s = {
-  wrap: { minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', background: 'linear-gradient(135deg, #f0fdf9 0%, #f8f9fa 60%)' },
-  card: { background: '#fff', borderRadius: 16, padding: '40px 36px', width: '100%', maxWidth: 400, boxShadow: '0 8px 32px rgba(0,0,0,0.08)', border: '1px solid rgba(0,0,0,0.06)' },
+  wrap: {
+    minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
+    padding: '20px', background: 'linear-gradient(135deg, #064E3B 0%, #1D9E75 100%)',
+    fontFamily: 'system-ui, -apple-system, sans-serif',
+  },
+  card: {
+    background: 'rgba(255,255,255,0.12)', backdropFilter: 'blur(16px)',
+    WebkitBackdropFilter: 'blur(16px)',
+    border: '1px solid rgba(255,255,255,0.2)', borderRadius: 20,
+    padding: '40px 36px', width: '100%', maxWidth: 400,
+    boxShadow: '0 8px 40px rgba(0,0,0,0.25)',
+  },
   logo: { display: 'flex', alignItems: 'center', gap: 10, marginBottom: 28 },
-  logoIcon: { width: 38, height: 38, background: '#1D9E75', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 18, fontWeight: 600 },
-  logoName: { fontSize: 20, fontWeight: 600, letterSpacing: '-0.02em' },
-  title: { fontSize: 22, fontWeight: 600, marginBottom: 6 },
-  sub: { fontSize: 14, color: '#6B7280', marginBottom: 28 },
-  label: { display: 'block', fontSize: 13, fontWeight: 500, marginBottom: 5, color: '#374151' },
-  input: { width: '100%', padding: '10px 14px', border: '1px solid rgba(0,0,0,0.14)', borderRadius: 8, fontSize: 14, outline: 'none', transition: 'border-color .15s', marginBottom: 16 },
-  btn: { width: '100%', padding: '11px', background: '#1D9E75', color: '#fff', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 500, cursor: 'pointer', transition: 'background .15s' },
-  toggle: { textAlign: 'center', marginTop: 20, fontSize: 13, color: '#6B7280' },
-  toggleLink: { color: '#1D9E75', cursor: 'pointer', fontWeight: 500 },
-  error: { background: '#FEE2E2', color: '#991B1B', padding: '10px 14px', borderRadius: 8, fontSize: 13, marginBottom: 16 },
-  success: { background: '#E1F5EE', color: '#085041', padding: '10px 14px', borderRadius: 8, fontSize: 13, marginBottom: 16 },
+  logoIcon: {
+    width: 38, height: 38, background: 'rgba(255,255,255,0.2)', borderRadius: 10,
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    color: '#fff', fontSize: 18, fontWeight: 700, border: '1px solid rgba(255,255,255,0.3)',
+  },
+  logoName: { fontSize: 20, fontWeight: 700, letterSpacing: '-0.02em', color: '#fff' },
+  title: { fontSize: 22, fontWeight: 700, marginBottom: 6, color: '#fff' },
+  sub: { fontSize: 14, color: 'rgba(255,255,255,0.7)', marginBottom: 28 },
+  label: { display: 'block', fontSize: 13, fontWeight: 500, marginBottom: 5, color: 'rgba(255,255,255,0.85)' },
+  input: {
+    width: '100%', padding: '11px 14px',
+    border: '1px solid rgba(255,255,255,0.3)', borderRadius: 10, fontSize: 14,
+    outline: 'none', marginBottom: 16, boxSizing: 'border-box',
+    background: 'rgba(255,255,255,0.15)', color: '#fff',
+    fontFamily: 'inherit',
+  },
+  btn: {
+    width: '100%', padding: '12px', background: '#fff', color: '#064E3B',
+    border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700,
+    cursor: 'pointer', transition: 'opacity .15s', fontFamily: 'inherit',
+  },
+  toggle: { textAlign: 'center', marginTop: 20, fontSize: 13, color: 'rgba(255,255,255,0.65)' },
+  toggleLink: { color: '#A7F3D0', cursor: 'pointer', fontWeight: 600 },
+  error: {
+    background: 'rgba(254,226,226,0.15)', color: '#FCA5A5',
+    border: '1px solid rgba(252,165,165,0.3)',
+    padding: '10px 14px', borderRadius: 8, fontSize: 13, marginBottom: 16,
+  },
+  success: {
+    background: 'rgba(209,250,229,0.15)', color: '#A7F3D0',
+    border: '1px solid rgba(167,243,208,0.3)',
+    padding: '10px 14px', borderRadius: 8, fontSize: 13, marginBottom: 16,
+  },
 }
 
 export default function Auth({ onBack }) {
@@ -52,11 +84,18 @@ export default function Auth({ onBack }) {
   return (
     <div style={s.wrap}>
       {onBack && (
-        <button onClick={onBack} style={{ position: 'fixed', top: 20, left: 24, background: 'rgba(6,40,30,0.08)', border: 'none', color: '#065F46', fontSize: 13, fontWeight: 500, cursor: 'pointer', padding: '8px 16px', borderRadius: 20, display: 'flex', alignItems: 'center', gap: 6 }}>
+        <button onClick={onBack} style={{ position: 'fixed', top: 20, left: 24, background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', color: '#fff', fontSize: 13, fontWeight: 500, cursor: 'pointer', padding: '8px 16px', borderRadius: 20, display: 'flex', alignItems: 'center', gap: 6, backdropFilter: 'blur(4px)' }}>
           ← Zur Startseite
         </button>
       )}
-      <div style={s.card}>
+      <style>{`
+        input::placeholder { color: rgba(255,255,255,0.45); }
+        input { caret-color: #fff; }
+        @media (max-width: 480px) {
+          .auth-card { padding: 32px 24px !important; }
+        }
+      `}</style>
+      <div style={s.card} className="auth-card">
         <div style={s.logo}>
           <div style={s.logoIcon}>L</div>
           <span style={s.logoName}>LearnHub</span>
