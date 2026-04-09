@@ -3,10 +3,26 @@ import { AREAS } from './Sidebar'
 import { supabase } from '../lib/supabase'
 import NeedFinderPanel from './NeedFinderPanel'
 
+const BookIcon = () => (
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1D9E75" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+  </svg>
+)
+const FlagIcon = () => (
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1D9E75" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/>
+  </svg>
+)
+const TrophyIcon = () => (
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1D9E75" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="8 22 12 17 16 22"/><polyline points="7 10 7 4 17 4 17 10"/><path d="M7 10a5 5 0 0 0 10 0"/><line x1="12" y1="17" x2="12" y2="22"/><path d="M7 4H5a2 2 0 0 0-2 2v1a5 5 0 0 0 5 5"/><path d="M17 4h2a2 2 0 0 1 2 2v1a5 5 0 0 1-5 5"/>
+  </svg>
+)
+
 const FEATURES = [
-  { icon: '🤖', title: 'KI-Lerninhalte', desc: 'Personalisiert für dein Level und Fachbereich' },
-  { icon: '🇨🇭', title: 'Schweizer Kontext', desc: 'Praxisbeispiele aus dem Schweizer Berufsalltag' },
-  { icon: '🎮', title: 'Gamification', desc: 'XP sammeln, Level aufsteigen, Badges gewinnen' },
+  { Icon: BookIcon,   title: 'KI-Lerninhalte',   desc: 'Personalisiert für dein Level und Fachbereich' },
+  { Icon: FlagIcon,   title: 'Schweizer Kontext', desc: 'Praxisbeispiele aus dem Schweizer Berufsalltag' },
+  { Icon: TrophyIcon, title: 'Gamification',      desc: 'XP sammeln, Level aufsteigen, Badges gewinnen' },
 ]
 
 const TESTIMONIALS = [
@@ -138,7 +154,7 @@ export default function LandingPage({ onStartAuth, backToDashboard }) {
           <div style={{ position: 'absolute', top: -40, right: -40, width: 200, height: 200, background: 'rgba(255,255,255,0.04)', borderRadius: '50%' }} />
           <div className="lp-fadein">
             <button onClick={() => setView('area')} style={{ background: 'rgba(255,255,255,0.12)', border: 'none', color: '#A7F3D0', fontSize: 12, padding: '4px 14px', borderRadius: 20, cursor: 'pointer', marginBottom: 20 }}>
-              {selectedArea.icon} {selectedArea.name}
+              {selectedArea.name}
             </button>
             <h1 style={{ color: '#fff', fontSize: 'clamp(24px, 4vw, 40px)', fontWeight: 800, lineHeight: 1.2, marginBottom: 16, letterSpacing: '-0.02em' }}>
               {selectedTopic.name}
@@ -162,13 +178,13 @@ export default function LandingPage({ onStartAuth, backToDashboard }) {
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {[
-                { icon: '📖', text: 'Strukturierter Lerntext (ca. 300 Wörter)' },
-                { icon: '🧠', text: '5 Multiple-Choice-Quizfragen zum Testen' },
-                { icon: '⭐', text: 'XP verdienen und Level aufsteigen' },
-              ].map((item, i) => (
+                'Strukturierter Lerntext (ca. 300 Wörter)',
+                '5 Multiple-Choice-Quizfragen zum Testen',
+                'XP verdienen und Level aufsteigen',
+              ].map((text, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', background: '#F8F9FA', borderRadius: 10 }}>
-                  <span style={{ fontSize: 18 }}>{item.icon}</span>
-                  <span style={{ fontSize: 14, color: '#374151' }}>{item.text}</span>
+                  <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#1D9E75', flexShrink: 0 }} />
+                  <span style={{ fontSize: 14, color: '#374151' }}>{text}</span>
                 </div>
               ))}
             </div>
@@ -178,8 +194,8 @@ export default function LandingPage({ onStartAuth, backToDashboard }) {
           {selectedTopic.level && (
             <div style={{ background: '#fff', borderRadius: 16, padding: '20px 24px', marginBottom: 24, border: `2px solid ${color}20`, boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div style={{ width: 36, height: 36, background: `${color}18`, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>
-                  {selectedTopic.level === 'einsteiger' ? '🌱' : selectedTopic.level === 'fortgeschrittene' ? '🌿' : '🌳'}
+                <div style={{ width: 36, height: 36, background: `${color}18`, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <div style={{ width: 14, height: 14, borderRadius: '50%', background: color }} />
                 </div>
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 600, color }}>Level: {LEVEL_LABELS[selectedTopic.level]}</div>
@@ -195,7 +211,9 @@ export default function LandingPage({ onStartAuth, backToDashboard }) {
 
           {/* CTA */}
           <div style={{ background: 'linear-gradient(135deg, #064E3B, #1D9E75)', borderRadius: 20, padding: '32px', textAlign: 'center' }}>
-            <div style={{ fontSize: 20, marginBottom: 8 }}>🚀</div>
+            <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 8px' }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </div>
             <h3 style={{ color: '#fff', fontSize: 18, fontWeight: 700, marginBottom: 8 }}>Bereit zu lernen?</h3>
             <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 14, marginBottom: 20 }}>Erstelle kostenlos ein Konto und starte sofort.</p>
             <button onClick={onStartAuth} className="cta-btn" style={{ background: '#fff', color: '#064E3B', border: 'none', borderRadius: 10, padding: '12px 28px', fontSize: 14, fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}>
@@ -221,7 +239,10 @@ export default function LandingPage({ onStartAuth, backToDashboard }) {
         }}>
           <div style={{ position: 'absolute', inset: 0, backgroundImage: 'url(https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1200)', backgroundSize: 'cover', backgroundPosition: 'center', opacity: 0.08 }} />
           <div className="lp-fadein" style={{ position: 'relative', zIndex: 1 }}>
-            <div style={{ fontSize: 48, marginBottom: 12 }}>{selectedArea.icon}</div>
+            <div style={{ width: 56, height: 56, borderRadius: 16, overflow: 'hidden', margin: '0 auto 12px', boxShadow: `0 0 0 3px ${selectedArea.color}` }}>
+              <img src={`https://images.unsplash.com/${selectedArea.photo}?w=120&q=80`}
+                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} alt="" />
+            </div>
             <h1 style={{ color: '#fff', fontSize: 'clamp(24px, 4vw, 36px)', fontWeight: 800, marginBottom: 8, letterSpacing: '-0.02em' }}>{selectedArea.name}</h1>
             <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: 15 }}>
               {loadingTopics ? 'Lade Themen...' : `${areaTopics.length} Lernthemen verfügbar`}
@@ -251,8 +272,8 @@ export default function LandingPage({ onStartAuth, backToDashboard }) {
                       display: 'flex', alignItems: 'center', gap: 16,
                       boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
                     }}>
-                      <div style={{ width: 44, height: 44, background: `${color}15`, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>
-                        {t.level === 'einsteiger' ? '🌱' : t.level === 'fortgeschrittene' ? '🌿' : t.level === 'experte' ? '🌳' : '📚'}
+                      <div style={{ width: 44, height: 44, background: `${color}15`, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        <div style={{ width: 16, height: 16, borderRadius: '50%', background: color }} />
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontWeight: 600, fontSize: 15, marginBottom: 4, color: '#111827' }}>{t.name}</div>
@@ -305,7 +326,8 @@ export default function LandingPage({ onStartAuth, backToDashboard }) {
           <div style={{ position: 'absolute', bottom: -80, right: -40, width: 400, height: 400, background: 'rgba(255,255,255,0.03)', borderRadius: '50%' }} />
 
           <div className="lp-fade" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.12)', borderRadius: 20, padding: '5px 16px', fontSize: 13, color: '#A7F3D0', marginBottom: 20, backdropFilter: 'blur(4px)' }}>
-            ✨ KI-gestützt · Schweizer Kontext · Kostenlos
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#6EE7B7', display: 'inline-block', marginRight: 2 }} />
+            {' '}KI-gestützt · Schweizer Kontext · Kostenlos
           </div>
 
           <h1 className="lp-fade-2" style={{ color: '#fff', fontSize: 'clamp(32px, 5vw, 52px)', fontWeight: 800, lineHeight: 1.15, marginBottom: 16, letterSpacing: '-0.02em' }}>
@@ -342,13 +364,16 @@ export default function LandingPage({ onStartAuth, backToDashboard }) {
             <div className="areas-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(120px, 1fr))', gap: 16, maxWidth: 720, margin: '0 auto' }}>
               {AREAS.map(a => (
                 <button key={a.id} onClick={() => handleAreaClick(a)} className="area-card" style={{
-                  background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(12px)',
-                  border: '1px solid rgba(255,255,255,0.18)', borderRadius: 14,
-                  padding: '20px 12px', cursor: 'pointer', textAlign: 'center',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+                  position: 'relative', borderRadius: 14, overflow: 'hidden',
+                  aspectRatio: '3/4', cursor: 'pointer', border: 'none', padding: 0,
+                  boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
                 }}>
-                  <div style={{ fontSize: 28, marginBottom: 8 }}>{a.icon}</div>
-                  <div style={{ color: '#fff', fontSize: 13, fontWeight: 500 }}>{a.name}</div>
+                  <img src={`https://images.unsplash.com/${a.photo}?w=300&q=80`}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} alt="" />
+                  <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(160deg, ${a.color}66 0%, ${a.color}ee 100%)` }} />
+                  <div style={{ position: 'absolute', inset: 0, padding: 12, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
+                    <div style={{ color: '#fff', fontSize: 12, fontWeight: 800, lineHeight: 1.25 }}>{a.name}</div>
+                  </div>
                 </button>
               ))}
             </div>
@@ -362,7 +387,7 @@ export default function LandingPage({ onStartAuth, backToDashboard }) {
           <div className="features-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 32, maxWidth: 840, margin: '0 auto' }}>
             {FEATURES.map((f, i) => (
               <div key={i} style={{ padding: '28px 24px', background: '#F8F9FA', borderRadius: 16, border: '1px solid rgba(0,0,0,0.06)' }}>
-                <div style={{ fontSize: 36, marginBottom: 12 }}>{f.icon}</div>
+                <div style={{ marginBottom: 12 }}><f.Icon /></div>
                 <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 8 }}>{f.title}</div>
                 <div style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.6 }}>{f.desc}</div>
               </div>
@@ -410,7 +435,7 @@ export default function LandingPage({ onStartAuth, backToDashboard }) {
 
       {/* Mobile: sticky bottom bar */}
       <div className="needfinder-mobile-bar">
-        <span style={{ fontSize: 13, fontWeight: 600 }}>🎯 Lernpfad personalisieren</span>
+        <span style={{ fontSize: 13, fontWeight: 600 }}>Lernpfad personalisieren</span>
         <button onClick={() => setShowMobilePanel(true)} style={{ background: '#fff', color: '#1D9E75', border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
           Starten →
         </button>
