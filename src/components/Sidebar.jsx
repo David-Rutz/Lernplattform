@@ -2,21 +2,55 @@ import { supabase } from '../lib/supabase'
 import { getLevelProgress } from '../lib/gamification'
 
 const AREAS = [
-  { id: 'ict', name: 'ICT & Informatik', icon: '💻' },
-  { id: 'marketing', name: 'Marketing', icon: '📢' },
-  { id: 'finanzen', name: 'Finanzen', icon: '📊' },
-  { id: 'management', name: 'Management', icon: '🏢' },
-  { id: 'hr', name: 'Personal (HR)', icon: '👥' },
-  { id: 'recht', name: 'Recht', icon: '⚖️' },
-  { id: 'verkauf', name: 'Verkauf', icon: '🤝' },
-  { id: 'vwl', name: 'Volkswirtschaft', icon: '🌍' },
+  { id: 'ict',        name: 'ICT & Informatik',  color: '#059669', photo: 'photo-1517694712202-14dd9538aa97' },
+  { id: 'marketing',  name: 'Marketing',          color: '#db2777', photo: 'photo-1560472354-b33ff0c44a43' },
+  { id: 'finanzen',   name: 'Finanzen',           color: '#d97706', photo: 'photo-1611974789855-9c2a0a7236a3' },
+  { id: 'management', name: 'Management',         color: '#6366f1', photo: 'photo-1552664730-d307ca884978' },
+  { id: 'hr',         name: 'Personal (HR)',      color: '#0891b2', photo: 'photo-1521737711867-e3b97375f902' },
+  { id: 'recht',      name: 'Recht',              color: '#57534e', photo: 'photo-1589829545856-d10d557cf95f' },
+  { id: 'verkauf',    name: 'Verkauf',            color: '#ea580c', photo: 'photo-1600880292203-757bb62b4baf' },
+  { id: 'vwl',        name: 'Volkswirtschaft',    color: '#2563eb', photo: 'photo-1486325212027-8081e485255e' },
 ]
 
 export { AREAS }
 
+export function AreaChip({ area, active }) {
+  return (
+    <div style={{
+      width: 28, height: 22, borderRadius: 5, overflow: 'hidden',
+      flexShrink: 0, position: 'relative',
+      boxShadow: active ? `0 0 0 1.5px ${area.color}` : 'none',
+    }}>
+      <img
+        src={`https://images.unsplash.com/${area.photo}?w=60&q=70`}
+        style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: active ? 1 : 0.7 }}
+        alt=""
+      />
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: `${area.color}${active ? '66' : '59'}`,
+      }} />
+    </div>
+  )
+}
+
+const HomeIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+    <polyline points="9 22 9 12 15 12 15 22"/>
+  </svg>
+)
+
+const ChartIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="18" y1="20" x2="18" y2="10"/>
+    <line x1="12" y1="20" x2="12" y2="4"/>
+    <line x1="6" y1="20" x2="6" y2="14"/>
+  </svg>
+)
+
 export default function Sidebar({ view, setView, selectedArea, setSelectedArea, user, progress, stats, onShowLanding }) {
   const totalTopics = Object.values(progress).reduce((s, a) => s + Object.keys(a).length, 0)
-
   const getAreaDone = (id) => Object.values(progress[id] || {}).filter(p => p.learned).length
 
   return (
@@ -34,18 +68,26 @@ export default function Sidebar({ view, setView, selectedArea, setSelectedArea, 
 
       {/* Nav */}
       <div style={{ flex: 1, padding: '12px 10px', overflowY: 'auto' }}>
-        <NavItem icon="🏠" label="Übersicht" active={view === 'home' && !selectedArea} onClick={() => { setView('home'); setSelectedArea(null) }} />
-        <NavItem icon="📈" label="Mein Fortschritt" active={view === 'progress'} onClick={() => { setView('progress'); setSelectedArea(null) }} badge={totalTopics > 0 ? totalTopics : null} />
+        <NavItem icon={<HomeIcon />} label="Übersicht" active={view === 'home' && !selectedArea} onClick={() => { setView('home'); setSelectedArea(null) }} />
+        <NavItem icon={<ChartIcon />} label="Mein Fortschritt" active={view === 'progress'} onClick={() => { setView('progress'); setSelectedArea(null) }} badge={totalTopics > 0 ? totalTopics : null} />
 
         <div style={{ margin: '16px 8px 6px', fontSize: 11, color: '#4B5563', fontWeight: 500, letterSpacing: '.06em', textTransform: 'uppercase' }}>Fachbereiche</div>
 
         {AREAS.map(a => {
           const done = getAreaDone(a.id)
+          const active = selectedArea?.id === a.id
           return (
-            <NavItem key={a.id} icon={a.icon} label={a.name}
-              active={selectedArea?.id === a.id}
-              badge={done > 0 ? done : null}
-              onClick={() => { setSelectedArea(a); setView('topics') }} />
+            <button key={a.id} onClick={() => { setSelectedArea(a); setView('topics') }} style={{
+              width: '100%', textAlign: 'left', display: 'flex', alignItems: 'center', gap: 10,
+              padding: '7px 10px', borderRadius: 8, marginBottom: 2,
+              background: active ? `${a.color}22` : 'none',
+              border: 'none', cursor: 'pointer',
+              color: active ? a.color : '#9CA3AF', transition: 'all .15s'
+            }}>
+              <AreaChip area={a} active={active} />
+              <span style={{ fontSize: 13, fontWeight: active ? 500 : 400, flex: 1 }}>{a.name}</span>
+              {done > 0 && <span style={{ background: `${a.color}22`, color: a.color, fontSize: 11, fontWeight: 500, padding: '1px 7px', borderRadius: 10 }}>{done}</span>}
+            </button>
           )
         })}
       </div>
@@ -71,7 +113,7 @@ export default function Sidebar({ view, setView, selectedArea, setSelectedArea, 
         <div style={{ display: 'flex', gap: 6 }}>
           {onShowLanding && (
             <button onClick={onShowLanding} style={{ flex: 1, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#9CA3AF', borderRadius: 7, padding: '7px 8px', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>
-              🌐 Website
+              ← Website
             </button>
           )}
           <button onClick={() => supabase.auth.signOut()} style={{ flex: 1, background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', color: '#F87171', borderRadius: 7, padding: '7px 8px', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>
@@ -90,7 +132,7 @@ function NavItem({ icon, label, active, onClick, badge }) {
       padding: '8px 10px', borderRadius: 8, marginBottom: 2, background: active ? 'rgba(29,158,117,0.15)' : 'none',
       border: 'none', cursor: 'pointer', color: active ? '#34D399' : '#9CA3AF', transition: 'all .15s'
     }}>
-      <span style={{ fontSize: 15 }}>{icon}</span>
+      <span style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>{icon}</span>
       <span style={{ fontSize: 13, fontWeight: active ? 500 : 400, flex: 1 }}>{label}</span>
       {badge != null && <span style={{ background: 'rgba(29,158,117,0.2)', color: '#34D399', fontSize: 11, fontWeight: 500, padding: '1px 7px', borderRadius: 10 }}>{badge}</span>}
     </button>
