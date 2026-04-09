@@ -184,6 +184,7 @@ export default function App() {
             <Progress
               progress={progress}
               topics={topics}
+              stats={stats}
               setSelectedArea={setSelectedArea}
               setSelectedTopic={setSelectedTopic}
               setView={setView}

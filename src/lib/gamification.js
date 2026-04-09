@@ -10,10 +10,10 @@ export const LEVELS = [
 ]
 
 export const BADGES = [
-  { id: 'first_step',   label: 'Erster Schritt', icon: '🌱', desc: 'Erstes Thema gelernt' },
-  { id: 'quiz_master',  label: 'Quiz-Meister',   icon: '🏆', desc: '5 Quizze mit 100% bestanden' },
-  { id: 'allrounder',   label: 'Allrounder',     icon: '🌍', desc: 'Alle 8 Fachbereiche angetastet' },
-  { id: 'streak_7',     label: 'Streak-7',       icon: '🔥', desc: '7 Tage in Folge gelernt' },
+  { id: 'first_step',  label: 'Erster Schritt', iconId: 'check-circle', desc: 'Erstes Thema gelernt' },
+  { id: 'quiz_master', label: 'Quiz-Meister',   iconId: 'star',         desc: '5 Quizze mit 100% bestanden' },
+  { id: 'allrounder',  label: 'Allrounder',     iconId: 'globe',        desc: 'Alle 8 Fachbereiche angetastet' },
+  { id: 'streak_7',    label: 'Streak-7',       iconId: 'flame',        desc: '7 Tage in Folge gelernt' },
 ]
 
 // Returns the current level object for a given XP amount
