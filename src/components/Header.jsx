@@ -1,5 +1,32 @@
 import { LEVELS, getLevelProgress } from '../lib/gamification'
 
+function StreakRing({ streak }) {
+  const circumference = 2 * Math.PI * 10
+  const filled = Math.min(streak, 7)
+  const offset = circumference * (1 - filled / 7)
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+      <svg width="28" height="28" style={{ transform: 'rotate(-90deg)', flexShrink: 0 }}>
+        <circle cx="14" cy="14" r="10" fill="none" stroke="rgba(217,119,6,0.2)" strokeWidth="3"/>
+        <circle cx="14" cy="14" r="10" fill="none" stroke="#d97706" strokeWidth="3"
+          strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round"/>
+      </svg>
+      <span style={{ color: '#d97706', fontSize: 12, fontWeight: 700 }}>{streak}d</span>
+    </div>
+  )
+}
+
+const CrosshairIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+    <circle cx="12" cy="12" r="10"/>
+    <circle cx="12" cy="12" r="3"/>
+    <line x1="12" y1="2" x2="12" y2="5"/>
+    <line x1="12" y1="19" x2="12" y2="22"/>
+    <line x1="2" y1="12" x2="5" y2="12"/>
+    <line x1="19" y1="12" x2="22" y2="12"/>
+  </svg>
+)
+
 export default function Header({ stats, onTogglePanel, showPanel }) {
   const xp = stats?.xp ?? 0
   const level = stats?.level ?? 1
@@ -30,11 +57,7 @@ export default function Header({ stats, onTogglePanel, showPanel }) {
         </div>
       </div>
 
-      {streak > 0 && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 13, color: '#F59E0B', fontWeight: 600 }}>
-          🔥 {streak} Tag{streak !== 1 ? 'e' : ''}
-        </div>
-      )}
+      {streak > 0 && <StreakRing streak={streak} />}
 
       {onTogglePanel && (
         <button onClick={onTogglePanel} style={{
@@ -45,7 +68,8 @@ export default function Header({ stats, onTogglePanel, showPanel }) {
           cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6,
           flexShrink: 0,
         }}>
-          🎯 Mein Profil
+          <CrosshairIcon />
+          Mein Profil
         </button>
       )}
     </div>
